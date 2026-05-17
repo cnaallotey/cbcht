@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // In a real app, we'd check a dedicated admins collection or custom claims.
+      // For this prototype, we'll allow the owner email if specified.
+      return isSignedIn() && request.auth.token.email == 'charlesallotey1995@gmail.com';
+    }
+
+    function isValidSermon(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.videoId is string && data.videoId.size() > 0;
+    }
+
+    function isValidBlogPost(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.content is string && data.content.size() > 0;
+    }
+
+    function isValidContactRequest(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.email is string && data.email.size() > 0 &&
+             data.message is string && data.message.size() > 0;
+    }
+
+    // Sermons: Public read, Admin write
+    match /sermons/{sermonId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidSermon(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Blog Posts: Public read, Admin write
+    match /blogPosts/{postId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidBlogPost(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Service Times: Public read, Admin write
+    match /serviceTimes/{serviceTimeId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Contact Requests: Create only for public, Admin read
+    match /contactRequests/{requestId} {
+      allow create: if isValidContactRequest(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

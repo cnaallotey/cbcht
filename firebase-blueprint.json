@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "Sermon": {
+      "title": "Sermon",
+      "description": "A recorded sermon with video and study materials.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "scripture": { "type": "string" },
+        "videoId": { "type": "string", "description": "YouTube Video ID" },
+        "thumbnail": { "type": "string" },
+        "transcript": { "type": "string", "description": "Markdown content of the sermon" },
+        "notesUrl": { "type": "string", "description": "URL to PDF notes" }
+      },
+      "required": ["title", "date", "videoId"]
+    },
+    "BlogPost": {
+      "title": "Blog Post",
+      "description": "A devotional or news post from the pastor.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["title", "date", "content"]
+    },
+    "ServiceTime": {
+      "title": "Service Time",
+      "description": "A scheduled church service.",
+      "type": "object",
+      "properties": {
+        "serviceName": { "type": "string" },
+        "day": { "type": "string" },
+        "time": { "type": "string" }
+      },
+      "required": ["serviceName", "day", "time"]
+    },
+    "ContactRequest": {
+      "title": "Contact Request",
+      "description": "A message from a visitor.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message"]
+    }
+  },
+  "firestore": {
+    "sermons": {
+      "schema": "Sermon",
+      "description": "Collection of sermons"
+    },
+    "blogPosts": {
+      "schema": "BlogPost",
+      "description": "Collection of blog posts and devotionals"
+    },
+    "serviceTimes": {
+      "schema": "ServiceTime",
+      "description": "Scheduled services"
+    },
+    "contactRequests": {
+      "schema": "ContactRequest",
+      "description": "Inbound contact form submissions"
+    }
+  }
+}

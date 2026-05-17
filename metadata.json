@@ -1,0 +1,10 @@
+{
+  "name": "Calvary Baptist Church",
+  "description": "A modern, mobile-first website for Calvary Baptist Church – Halleluyah Temple in Lashibi, Ghana, featuring a sermon media library and pastor's blog.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
