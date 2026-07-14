@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Facebook, Youtube, MessageCircle, Clock } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -13,15 +15,24 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      await addDoc(collection(db, 'contactRequests'), {
+        ...formState,
+        timestamp: new Date().toISOString()
+      });
       setIsSent(true);
       setFormState({ name: '', email: '', subject: '', message: '' });
-    }, 1500);
+      setTimeout(() => setIsSent(false), 5000);
+    } catch (err: any) {
+      console.error("Error submitting contact request:", err);
+      alert("Failed to submit message: " + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -53,7 +64,7 @@ export default function Contact() {
                   <div>
                     <h4 className="text-sm font-bold uppercase tracking-widest text-stone-400 mb-1">Our Location</h4>
                     <p className="text-lg font-serif font-bold text-stone-900">Lashibi, Accra-Ghana</p>
-                    <p className="text-stone-500">Off the Spintex Road, Halleluyah Temple</p>
+                    <p className="text-stone-500">Opposite funeral homes, Halleluyah Temple</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-6">
@@ -110,7 +121,7 @@ export default function Contact() {
             <motion.div 
               {...fadeInUp}
               transition={{ delay: 0.1 }}
-              className="rounded-[2.5rem] bg-white p-8 md:p-12 shadow-2xl shadow-stone-200 border border-stone-100"
+              className="bg-white p-8 md:p-12 shadow-2xl shadow-stone-200 border border-stone-100"
             >
               <h2 className="text-3xl font-serif font-bold text-stone-900 mb-8">Send a Message</h2>
               
@@ -207,7 +218,7 @@ export default function Contact() {
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white via-transparent to-white/50"></div>
         <div className="absolute bottom-10 left-10 z-10 rounded-2xl bg-white p-6 shadow-2xl max-w-sm pointer-events-auto">
           <h4 className="font-serif font-bold text-stone-900 mb-1">Find Us in Lashibi</h4>
-          <p className="text-xs text-stone-500 mb-4">Located near the Lashibi Community Hospital area.</p>
+          <p className="text-xs text-stone-500 mb-4">Located opposite funeral homes.</p>
           <a 
              href="https://maps.google.com" 
              target="_blank" 

@@ -40,7 +40,7 @@ export const mockBlogPosts: BlogPost[] = [
     date: '2026-05-15T10:00:00Z',
     excerpt: 'In the hustle and bustle of Lashibi life, it\'s easy to miss the quiet blessings God pours out on us every single day. Today, let\'s look for them.',
     content: 'Full devotional content here...',
-    author: 'Rev. Dr. Charles K. Allotey',
+    author: 'Reverend Lina Sunu Atta',
     category: 'Daily Devotional',
     image: 'https://images.unsplash.com/photo-1469474094887-b1e7632f7b21?q=80&w=2547&auto=format&fit=crop'
   },
@@ -57,7 +57,7 @@ export const mockBlogPosts: BlogPost[] = [
 ];
 
 export const mockServiceTimes: ServiceTime[] = [
-  { id: '1', serviceName: 'Sunday Morning Service', day: 'Sunday', time: '8:00 AM — 10:30 AM' },
-  { id: '2', serviceName: 'Midweek Prayer & Bible Study', day: 'Wednesday', time: '6:30 PM — 8:00 PM' },
-  { id: '3', serviceName: 'Hour of Deliverance', day: 'Friday', time: '9:00 AM — 12:00 PM' }
+  { id: '1', serviceName: 'Sunday Service', day: 'Sunday', time: '8:00 AM — 10:30 AM' },
+  { id: '2', serviceName: 'Midweek Bible Study', day: 'Wednesday', time: '6:30 PM — 8:00 PM' },
+  { id: '3', serviceName: 'Prayer Service', day: 'Friday', time: '6:00 AM — 7:00 PM' }
 ];

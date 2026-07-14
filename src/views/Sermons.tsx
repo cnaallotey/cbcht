@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Filter, Play, BookOpen, Download, X, Calendar, Book } from 'lucide-react';
 import { mockSermons } from '../data/mockData';
 import { Sermon } from '../types';
 import SermonCard from '../components/SermonCard';
 import Markdown from 'react-markdown';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -13,11 +15,26 @@ const fadeInUp = {
 };
 
 export default function Sermons() {
+  const [sermons, setSermons] = useState<Sermon[]>([]);
   const [selectedSermon, setSelectedSermon] = useState<Sermon | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
 
-  const filteredSermons = mockSermons.filter(sermon => {
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'sermons'), (snapshot) => {
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sermon));
+      list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setSermons(list);
+      setLoading(false);
+    }, (err) => console.error("Sermons page fetch error:", err));
+
+    return () => unsub();
+  }, []);
+
+  const activeSermons = sermons.length > 0 ? sermons : mockSermons;
+
+  const filteredSermons = activeSermons.filter(sermon => {
     const matchesSearch = sermon.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           sermon.scripture?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
@@ -114,7 +131,7 @@ export default function Sermons() {
               initial={{ y: 50, scale: 0.95 }}
               animate={{ y: 0, scale: 1 }}
               exit={{ y: 50, scale: 0.95 }}
-              className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] bg-white shadow-2xl no-scrollbar"
+              className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-none bg-white shadow-2xl no-scrollbar"
             >
               <button 
                 onClick={() => setSelectedSermon(null)}
@@ -184,7 +201,7 @@ export default function Sermons() {
                         <img src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop" alt="Pastor" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-stone-900">Rev. Charles Allotey</p>
+                        <p className="text-sm font-bold text-stone-900">Reverend Lina Sunu Atta</p>
                         <p className="text-[10px] text-stone-400 uppercase tracking-widest">Head Pastor</p>
                       </div>
                     </div>

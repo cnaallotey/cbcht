@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Menu, X, Phone, Mail, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -11,7 +14,7 @@ interface NavLinkProps {
 }
 
 const NavLink = ({ href, children, onClick, className }: NavLinkProps) => (
-  <a
+  <Link
     href={href}
     onClick={onClick}
     className={cn(
@@ -20,18 +23,18 @@ const NavLink = ({ href, children, onClick, className }: NavLinkProps) => (
     )}
   >
     {children}
-  </a>
+  </Link>
 );
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Sermons', href: '#sermons' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Sermons', href: '/sermons' },
+    { name: 'Devotionals & Announcements', href: '/blog' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -42,32 +45,35 @@ export default function Navbar() {
           <div className="flex gap-6">
             <span className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> +233 (0) XX XXX XXXX</span>
             <span className="flex items-center gap-1.5"><Mail className="h-3 w-3" /> info@calvarybaptist.com</span>
-            <span className="flex items-center gap-1.5"><MapPin className="h-3 w-3" /> Lashibi, Ghana</span>
+            <span className="flex items-center gap-1.5"><MapPin className="h-3 w-3" /> Lashibi, Tema</span>
           </div>
-          <div>Service Times: Sun 8:00 AM • Wed 6:30 PM</div>
+          <div>Service Times: Sun 8:00 AM • Wed 6:30 PM • Fri 6:30 PM</div>
         </div>
       </div>
 
       {/* Main Nav */}
       <div className="mx-auto max-w-7xl px-6 py-6 transition-all">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="text-church-blue font-black text-2xl tracking-tighter">CBC HALLELUYAH TEMPLE</div>
-          </div>
+          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <img src="/images/logo.png" alt="CBC Halleluyah Temple" className="h-10 md:h-12 w-auto object-contain" />
+            <span className="text-church-blue font-black text-sm md:text-sm  tracking-tighter hidden sm:inline-block">
+              CBC HALLELUYAH TEMPLE
+            </span>
+          </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden items-center gap-10 md:flex">
+          <div className="hidden items-center text-center whitespace-nowrap gap-10 md:flex">
             {navLinks.map((link) => (
               <NavLink key={link.name} href={link.href}>
                 {link.name}
               </NavLink>
             ))}
-            <a
-              href="#sermons"
+            <Link
+              href="/sermons"
               className="rounded-sm bg-church-blue px-8 py-3 text-sm font-bold text-white transition-all hover:bg-stone-900 shadow-md uppercase tracking-wider"
             >
               Watch Latest
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Toggle */}
@@ -100,13 +106,13 @@ export default function Navbar() {
                   {link.name}
                 </NavLink>
               ))}
-              <a
-                href="#sermons"
+              <Link
+                href="/sermons"
                 onClick={() => setIsOpen(false)}
                 className="mt-4 rounded-full bg-church-blue py-4 text-center text-lg font-bold text-white"
               >
                 WATCH LATEST
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

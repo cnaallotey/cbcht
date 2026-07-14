@@ -14,7 +14,7 @@ service cloud.firestore {
     function isAdmin() {
       // In a real app, we'd check a dedicated admins collection or custom claims.
       // For this prototype, we'll allow the owner email if specified.
-      return isSignedIn() && request.auth.token.email == 'charlesallotey1995@gmail.com';
+      return isSignedIn() && request.auth.token.email == 'admin@cbcht.com';
     }
 
     function isValidSermon(data) {

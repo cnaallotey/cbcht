@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Facebook, Youtube, MessageCircle, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 
 export default function Footer() {
@@ -8,11 +9,11 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Logo & Info */}
           <div>
-            <div className="mb-6 flex items-center gap-2">
-              <div className="h-10 w-10 overflow-hidden rounded-full bg-church-blue flex items-center justify-center text-church-gold font-bold text-xl">C</div>
+            <div className="mb-6 flex items-center gap-3">
+              <img src="/images/logo.png" alt="CBC Halleluyah Temple Logo" className="h-12 w-auto object-contain" />
               <div>
-                <h2 className="text-xl font-bold leading-tight tracking-tight">
-                  CALVARY BAPTIST
+                <h2 className="text-xl font-bold leading-tight tracking-tight text-white">
+                  CALVARY BAPTIST CHURCH
                 </h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-church-gold">
                   Halleluyah Temple
@@ -39,11 +40,11 @@ export default function Footer() {
           <div>
             <h3 className="mb-6 font-serif text-lg font-bold uppercase tracking-widest text-church-gold">Navigation</h3>
             <ul className="space-y-4 text-sm text-stone-400">
-              <li><a href="#home" className="transition-colors hover:text-white">Home</a></li>
-              <li><a href="#about" className="transition-colors hover:text-white">About Us</a></li>
-              <li><a href="#sermons" className="transition-colors hover:text-white">Sermon Library</a></li>
-              <li><a href="#blog" className="transition-colors hover:text-white">Pastor's Blog</a></li>
-              <li><a href="#contact" className="transition-colors hover:text-white">Contact Us</a></li>
+              <li><Link href="/" className="transition-colors hover:text-white">Home</Link></li>
+              <li><Link href="/about" className="transition-colors hover:text-white">About Us</Link></li>
+              <li><Link href="/sermons" className="transition-colors hover:text-white">Sermon Library</Link></li>
+              <li><Link href="/blog" className="transition-colors hover:text-white">Devotionals & Announcements</Link></li>
+              <li><Link href="/contact" className="transition-colors hover:text-white">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -53,7 +54,7 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-stone-400">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-1 h-4 w-4 shrink-0 text-church-gold" />
-                <span>Lashibi, Accra-Ghana<br />Off the Spintex Road</span>
+                <span>Lashibi, Accra-Ghana<br />Opposite funeral homes</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 shrink-0 text-church-gold" />
@@ -78,12 +79,12 @@ export default function Footer() {
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Midweek Prayer</p>
                 <p className="text-lg font-bold">Wednesday, 6:30 PM</p>
               </div>
-              <a 
-                href="#contact" 
+              <Link 
+                href="/contact" 
                 className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-church-blue py-3 text-sm font-bold transition-all hover:bg-blue-800"
               >
                 Plan Your Visit <ExternalLink className="h-3 w-3" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -28,9 +28,18 @@ export interface ServiceTime {
 }
 
 export interface ContactRequest {
+  id?: string;
   name: string;
   email: string;
   subject?: string;
   message: string;
   timestamp: string;
+}
+
+export interface Leader {
+  id: string;
+  name: string;
+  role: string;
+  image?: string;
+  order: number;
 }
