@@ -103,8 +103,15 @@ export default function Contact() {
                 <div className="flex gap-4">
                   <Clock className="h-5 w-5 text-church-gold shrink-0 mt-1" />
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-stone-400">Midweek Prayer</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-stone-400">Bible Study</p>
                     <p className="font-bold text-lg">Wednesday, 6:30 PM</p>
+                  </div>
+                </div>
+                 <div className="flex gap-4">
+                  <Clock className="h-5 w-5 text-church-gold shrink-0 mt-1" />
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-stone-400">Prayer Service</p>
+                    <p className="font-bold text-lg">Friday, 6:30 PM</p>
                   </div>
                 </div>
               </div>
@@ -206,7 +213,7 @@ export default function Contact() {
         <div className="absolute inset-0 z-0">
           {/* Simple Map Embed Placeholder - In real app, use Google Maps API */}
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15881.082046467023!2d-0.0381559!3d5.6738988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf895690b21841%3A0xe510f215d2efb18!2sLashibi!5e0!3m2!1sen!2sgh!4v1715948000000!5m2!1sen!2sgh" 
+            src="https://maps.google.com/maps?q=Calvary%20Baptist%20Church%20Halleluyah%20Temple%20Lashibi&t=&z=16&ie=UTF8&iwloc=&output=embed" 
             width="100%" 
             height="100%" 
             style={{ border: 0 }} 
@@ -216,11 +223,11 @@ export default function Contact() {
           ></iframe>
         </div>
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white via-transparent to-white/50"></div>
-        <div className="absolute bottom-10 left-10 z-10 rounded-2xl bg-white p-6 shadow-2xl max-w-sm pointer-events-auto">
+        <div className="absolute bottom-10 left-10 z-10 rounded-none bg-white p-6 shadow-2xl max-w-sm pointer-events-auto">
           <h4 className="font-serif font-bold text-stone-900 mb-1">Find Us in Lashibi</h4>
           <p className="text-xs text-stone-500 mb-4">Located opposite funeral homes.</p>
           <a 
-             href="https://maps.google.com" 
+             href="https://maps.app.goo.gl/vhnXWnB22XeQRZuf7" 
              target="_blank" 
              rel="noreferrer"
              className="text-xs font-bold text-church-blue uppercase tracking-widest underline decoration-2 underline-offset-4"

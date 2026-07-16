@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Logo & Info */}
           <div>
             <div className="mb-6 flex items-center gap-3">
-              <img src="/images/logo.png" alt="CBC Halleluyah Temple Logo" className="h-12 w-auto object-contain" />
+              <img src="/images/logo.png" alt="CBC Halleluyah Temple Logo" className="h-14 w-auto bg-white p-2 object-contain" />
               <div>
                 <h2 className="text-xl font-bold leading-tight tracking-tight text-white">
                   CALVARY BAPTIST CHURCH
@@ -75,9 +75,13 @@ export default function Footer() {
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Sunday Service</p>
                 <p className="text-lg font-bold">8:00 AM — 10:30 AM</p>
               </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Midweek Prayer</p>
+              <div className="mb-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Midweek Bible Study</p>
                 <p className="text-lg font-bold">Wednesday, 6:30 PM</p>
+              </div>
+               <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Prayer Meetings</p>
+                <p className="text-lg font-bold">Friday, 6:30 PM</p>
               </div>
               <Link 
                 href="/contact" 
