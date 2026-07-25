@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowRight, MapPin, Clock, Calendar, Play, BookOpen, Quote, X } from 'lucide-react';
-import { mockSermons, mockBlogPosts, mockServiceTimes } from '../data/mockData';
-import SermonCard from '../components/SermonCard';
+import { ArrowRight, MapPin, Clock, Calendar, BookOpen, Quote, X } from 'lucide-react';
+import { mockBlogPosts, mockServiceTimes } from '../data/mockData';
 import BlogCard from '../components/BlogCard';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { Sermon, BlogPost, ServiceTime } from '../types';
+import { BlogPost, ServiceTime } from '../types';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -17,19 +16,11 @@ const fadeInUp = {
 };
 
 export default function Home() {
-  const [sermons, setSermons] = useState<Sermon[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [services, setServices] = useState<ServiceTime[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [playLatestSermon, setPlayLatestSermon] = useState(false);
 
   useEffect(() => {
-    const unsubSermons = onSnapshot(collection(db, 'sermons'), (snapshot) => {
-      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sermon));
-      list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      setSermons(list);
-    }, (err) => console.error("Home sermons fetch error:", err));
-
     const unsubBlogs = onSnapshot(collection(db, 'blogPosts'), (snapshot) => {
       const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
       list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -42,17 +33,14 @@ export default function Home() {
     }, (err) => console.error("Home services fetch error:", err));
 
     return () => {
-      unsubSermons();
       unsubBlogs();
       unsubServices();
     };
   }, []);
 
-  const activeSermons = sermons.length > 0 ? sermons : mockSermons;
   const activeBlogs = blogs.length > 0 ? blogs : mockBlogPosts;
   const activeServices = services.length > 0 ? services : mockServiceTimes;
 
-  const latestSermon = activeSermons[0];
   const featuredBlog = activeBlogs[0];
 
   return (
@@ -85,12 +73,12 @@ export default function Home() {
               Join us in Lashibi as we celebrate the living Word and grow together in faith.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a 
-                href="#sermons" 
+              <Link 
+                href="/sermons" 
                 className="flex items-center justify-center gap-2 rounded-sm bg-church-gold px-8 py-5 text-sm font-bold uppercase tracking-widest text-church-blue transition-all hover:bg-white hover:scale-105"
               >
-                Watch Latest Sermon
-              </a>
+                Browse Sermons
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -119,107 +107,6 @@ export default function Home() {
               <span>{service.serviceName}: {service.day}s {service.time}</span>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Latest Sermon Section */}
-      <section id="sermons" className="py-24 bg-stone-50">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-xl">
-              <motion.span 
-                {...fadeInUp}
-                className="text-[10px] font-bold uppercase tracking-[0.4em] text-church-gold-warm mb-3 block"
-              >
-                Media Library
-              </motion.span>
-              <motion.h2 
-                {...fadeInUp}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl md:text-5xl font-serif font-bold text-stone-900"
-              >
-                The Latest <span className="text-church-blue italic">Messages</span>
-              </motion.h2>
-            </div>
-            <motion.div 
-              {...fadeInUp}
-              className="inline-block"
-            >
-              <Link 
-                href="/sermons"
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-church-blue border-b-2 border-church-blue pb-1 transition-all hover:gap-4"
-              >
-                Browse All Sermons <ArrowRight className="h-3 w-3" />
-              </Link>
-            </motion.div>
-          </div>
-
-          <div className="grid gap-12 lg:grid-cols-12">
-            <motion.div 
-              {...fadeInUp}
-              className="lg:col-span-12 group relative overflow-hidden bg-white shadow-xl border border-stone-200"
-            >
-              {playLatestSermon ? (
-                <div className="aspect-video w-full bg-black">
-                  <iframe
-                    className="w-full h-full border-none"
-                    src={`https://www.youtube.com/embed/${latestSermon.videoId}?autoplay=1`}
-                    title={latestSermon.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              ) : (
-                <div className="relative aspect-video w-full overflow-hidden cursor-pointer" onClick={() => setPlayLatestSermon(true)}>
-                  <img 
-                    src={latestSermon.thumbnail} 
-                    alt={latestSermon.title} 
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="rounded-none bg-church-gold p-6 text-church-blue shadow-2xl transition-transform group-hover:scale-110">
-                      <Play className="h-8 w-8 fill-current" />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 text-white pointer-events-none">
-                    <div className="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-church-gold">
-                      <span>Most Recent</span>
-                      <span className="h-1 w-1 rounded-full bg-white/30"></span>
-                      <span>{latestSermon.scripture}</span>
-                    </div>
-                    <h3 className="mb-6 font-serif text-3xl md:text-4xl font-bold leading-tight">
-                      {latestSermon.title}
-                    </h3>
-                    <div className="flex gap-4 pointer-events-auto">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPlayLatestSermon(true);
-                        }}
-                        className="flex items-center gap-2 rounded-none bg-white px-6 py-3 text-sm font-bold uppercase tracking-widest text-church-blue transition-colors hover:bg-church-gold"
-                      >
-                        Watch Now <Play className="h-4 w-4 fill-current" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Side Sermons */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-              {activeSermons.slice(1, 3).map((sermon, idx) => (
-                <motion.div 
-                  key={sermon.id}
-                  {...fadeInUp}
-                  transition={{ delay: 0.2 + (idx * 0.1) }}
-                >
-                  <SermonCard sermon={sermon} onClick={() => {}} />
-                </motion.div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
