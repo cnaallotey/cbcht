@@ -43,3 +43,19 @@ export interface Leader {
   image?: string;
   order: number;
 }
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  caption?: string;
+}
+
+export interface GalleryGroup {
+  id: string;
+  name: string;
+  description?: string;
+  date?: string;
+  images: GalleryImage[];
+  createdAt: string;
+}
+

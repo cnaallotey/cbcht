@@ -5,18 +5,19 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from '../../lib/firebase';
 import { collection, deleteDoc, doc, onSnapshot, addDoc } from 'firebase/firestore';
-import { Sermon, BlogPost, ServiceTime, ContactRequest, Leader } from '../../types';
+import { Sermon, BlogPost, ServiceTime, ContactRequest, Leader, GalleryGroup } from '../../types';
 import { mockSermons, mockBlogPosts, mockServiceTimes } from '../../data/mockData';
 import { 
   Video, BookOpen, Clock, Mail, LogOut, Plus, Trash2, Edit, Database, 
-  Loader2, ExternalLink, Calendar, User, Search, RefreshCw, MessageSquare, Users
+  Loader2, ExternalLink, Calendar, User, Search, RefreshCw, MessageSquare, Users, Image as ImageIcon
 } from 'lucide-react';
 import SermonForm from '../../components/admin/SermonForm';
 import BlogPostForm from '../../components/admin/BlogPostForm';
 import ServiceTimeForm from '../../components/admin/ServiceTimeForm';
 import LeaderForm from '../../components/admin/LeaderForm';
+import GalleryForm from '../../components/admin/GalleryForm';
 
-type ActiveTab = 'sermons' | 'blogs' | 'services' | 'contacts' | 'leadership';
+type ActiveTab = 'sermons' | 'blogs' | 'services' | 'contacts' | 'leadership' | 'gallery';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -29,6 +30,7 @@ export default function AdminDashboard() {
   const [services, setServices] = useState<ServiceTime[]>([]);
   const [contacts, setContacts] = useState<ContactRequest[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [galleryGroups, setGalleryGroups] = useState<GalleryGroup[]>([]);
   
   // Data Loading status
   const [dataLoading, setDataLoading] = useState(true);
@@ -43,6 +45,8 @@ export default function AdminDashboard() {
   const [serviceFormOpen, setServiceFormOpen] = useState(false);
   const [activeLeader, setActiveLeader] = useState<Leader | null>(null);
   const [leaderFormOpen, setLeaderFormOpen] = useState(false);
+  const [activeGalleryGroup, setActiveGalleryGroup] = useState<GalleryGroup | null>(null);
+  const [galleryFormOpen, setGalleryFormOpen] = useState(false);
 
   const router = useRouter();
 
@@ -106,14 +110,30 @@ export default function AdminDashboard() {
       setLeaders(leaderList);
     }, (err) => console.error("Leaders fetch error:", err));
 
+    const unsubGallery = onSnapshot(collection(db, 'gallery'), (snapshot) => {
+      const groupList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as GalleryGroup));
+      groupList.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      setGalleryGroups(groupList);
+    }, (err) => console.error("Gallery fetch error:", err));
+
     return () => {
       unsubSermons();
       unsubBlogs();
       unsubServices();
       unsubContacts();
       unsubLeaders();
+      unsubGallery();
     };
   }, [user]);
+
+  const handleDeleteGalleryGroup = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete the gallery group "${name}"?`)) return;
+    try {
+      await deleteDoc(doc(db, 'gallery', id));
+    } catch (err: any) {
+      alert('Failed to delete gallery group: ' + err.message);
+    }
+  };
 
   // Logout Handler
   const handleLogout = async () => {
@@ -156,6 +176,35 @@ export default function AdminDashboard() {
       for (const leader of mockLeaders) {
         await addDoc(collection(db, 'leadership'), leader);
       }
+
+      // Seed default gallery groups
+      const mockGalleryGroups = [
+        {
+          name: 'Easter Sunday Service 2026',
+          description: 'Photos of praise and fellowship from our Resurrection Sunday Service.',
+          date: '2026-04-05',
+          createdAt: new Date().toISOString(),
+          images: [
+            { id: '1', url: 'https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=1200&auto=format&fit=crop', caption: 'Choir Worship Service' },
+            { id: '2', url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=1200&auto=format&fit=crop', caption: 'Congregation Fellowship' },
+            { id: '3', url: 'https://images.unsplash.com/photo-1499209974431-9dac3adaf471?q=80&w=1200&auto=format&fit=crop', caption: 'Prayer Time' }
+          ]
+        },
+        {
+          name: 'Youth Conference & Outreach',
+          description: 'Highlights from our annual Youth Halleluyah Summit at Lashibi.',
+          date: '2026-02-14',
+          createdAt: new Date().toISOString(),
+          images: [
+            { id: '4', url: 'https://images.unsplash.com/photo-1469474094887-b1e7632f7b21?q=80&w=1200&auto=format&fit=crop', caption: 'Youth Worship Team' },
+            { id: '5', url: 'https://images.unsplash.com/photo-1512401763750-6a953e5e4823?q=80&w=1200&auto=format&fit=crop', caption: 'Group Photo' }
+          ]
+        }
+      ];
+      for (const galleryGroup of mockGalleryGroups) {
+        await addDoc(collection(db, 'gallery'), galleryGroup);
+      }
+
       alert('Mock records seeded successfully!');
     } catch (err: any) {
       console.error('Database seeding failed:', err);
@@ -176,7 +225,7 @@ export default function AdminDashboard() {
     );
   }
 
-  const isDbEmpty = sermons.length === 0 && blogs.length === 0 && services.length === 0 && leaders.length === 0;
+  const isDbEmpty = sermons.length === 0 && blogs.length === 0 && services.length === 0 && leaders.length === 0 && galleryGroups.length === 0;
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 pt-28 pb-20 font-sans">
@@ -227,8 +276,8 @@ export default function AdminDashboard() {
 
         {/* Tabs Bar */}
         <section className="flex flex-wrap items-center justify-between border-b border-stone-200 pb-4 mb-8 gap-4">
-          <div className="flex gap-2 p-1 bg-stone-200/50 border border-stone-200 rounded-none">
-            {(['sermons', 'blogs', 'services', 'leadership', 'contacts'] as ActiveTab[]).map((tab) => (
+          <div className="flex flex-wrap gap-2 p-1 bg-stone-200/50 border border-stone-200 rounded-none">
+            {(['sermons', 'blogs', 'services', 'leadership', 'gallery', 'contacts'] as ActiveTab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -238,7 +287,7 @@ export default function AdminDashboard() {
                     : 'text-stone-500 hover:text-stone-900'
                 }`}
               >
-                {tab === 'blogs' ? 'Devotionals' : tab === 'services' ? 'Services' : tab === 'contacts' ? 'Inquiries' : tab === 'leadership' ? 'Leadership' : 'Sermons'}
+                {tab === 'blogs' ? 'Devotionals' : tab === 'services' ? 'Services' : tab === 'contacts' ? 'Inquiries' : tab === 'leadership' ? 'Leadership' : tab === 'gallery' ? 'Gallery' : 'Sermons'}
               </button>
             ))}
           </div>
@@ -258,12 +307,15 @@ export default function AdminDashboard() {
                 } else if (activeTab === 'leadership') {
                   setActiveLeader(null);
                   setLeaderFormOpen(true);
+                } else if (activeTab === 'gallery') {
+                  setActiveGalleryGroup(null);
+                  setGalleryFormOpen(true);
                 }
               }}
               className="flex items-center justify-center gap-2 rounded-none bg-church-blue hover:bg-blue-800 py-3.5 px-6 text-xs font-bold uppercase tracking-widest transition-all text-white shadow-md"
             >
               <Plus className="h-4 w-4" />
-              Add {activeTab === 'sermons' ? 'Sermon' : activeTab === 'blogs' ? 'Devotional' : activeTab === 'services' ? 'Service' : 'Leader'}
+              Add {activeTab === 'sermons' ? 'Sermon' : activeTab === 'blogs' ? 'Devotional' : activeTab === 'services' ? 'Service' : activeTab === 'leadership' ? 'Leader' : 'Gallery Group'}
             </button>
           )}
         </section>
@@ -582,8 +634,100 @@ export default function AdminDashboard() {
                   )}
                 </div>
               )}
+
+              {/* Tab 6: Gallery Groups list */}
+              {activeTab === 'gallery' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-stone-900">Photo Gallery Groups</h3>
+                      <p className="text-xs text-stone-500 mt-0.5">Manage photo albums, group names, and Google Drive/Photos links.</p>
+                    </div>
+                    <span className="text-xs font-mono bg-stone-100 px-3 py-1 text-stone-600">
+                      {galleryGroups.length} {galleryGroups.length === 1 ? 'Group' : 'Groups'}
+                    </span>
+                  </div>
+
+                  {galleryGroups.length === 0 ? (
+                    <div className="text-center py-16 border-2 border-dashed border-stone-200">
+                      <ImageIcon className="mx-auto h-12 w-12 text-stone-300 mb-3" />
+                      <p className="text-sm font-bold text-stone-700">No Gallery Groups Created Yet</p>
+                      <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+                        Click &ldquo;Add Gallery Group&rdquo; above to create your first album with Google Drive or Google Photos links.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {galleryGroups.map((group) => (
+                        <div key={group.id} className="border border-stone-200 bg-white p-5 shadow-sm flex flex-col justify-between group hover:border-stone-300 transition-all">
+                          <div>
+                            {/* Thumbnails preview */}
+                            <div className="grid grid-cols-3 gap-1 bg-stone-100 p-1 border border-stone-200 mb-4 h-32 overflow-hidden relative">
+                              {group.images && group.images.slice(0, 3).map((img, i) => (
+                                <div key={img.id || i} className="h-full w-full bg-stone-200 relative overflow-hidden">
+                                  <img src={img.url} alt={img.caption || group.name} className="h-full w-full object-cover" />
+                                </div>
+                              ))}
+                              {(!group.images || group.images.length === 0) && (
+                                <div className="col-span-3 h-full flex items-center justify-center text-xs text-stone-400">
+                                  No photos
+                                </div>
+                              )}
+                              {group.images && group.images.length > 3 && (
+                                <span className="absolute bottom-2 right-2 bg-stone-900/80 text-white text-[10px] font-mono px-2 py-0.5">
+                                  +{group.images.length - 3} more
+                                </span>
+                              )}
+                            </div>
+
+                            <h4 className="font-serif text-lg font-bold text-stone-900 group-hover:text-church-blue transition-colors">
+                              {group.name}
+                            </h4>
+                            {group.date && (
+                              <p className="text-xs text-stone-400 mt-1 flex items-center gap-1">
+                                <Calendar className="h-3 w-3" /> {group.date}
+                              </p>
+                            )}
+                            {group.description && (
+                              <p className="text-xs text-stone-600 mt-2 line-clamp-2 leading-relaxed">
+                                {group.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-4 mt-4 border-t border-stone-100 text-xs">
+                            <span className="font-mono text-stone-500 font-semibold">
+                              {group.images ? group.images.length : 0} Photos
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setActiveGalleryGroup(group);
+                                  setGalleryFormOpen(true);
+                                }}
+                                className="p-2 border border-stone-200 hover:bg-stone-50 text-stone-700 hover:text-stone-900 transition-colors"
+                                title="Edit group"
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteGalleryGroup(group.id, group.name)}
+                                className="p-2 border border-stone-200 hover:bg-red-50 text-stone-400 hover:text-red-600 transition-colors"
+                                title="Delete group"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
+
         </section>
       </main>
 
@@ -630,6 +774,18 @@ export default function AdminDashboard() {
           }}
         />
       )}
+
+      {/* Gallery Group Add/Edit Modal */}
+      {galleryFormOpen && (
+        <GalleryForm 
+          group={activeGalleryGroup}
+          onClose={() => {
+            setGalleryFormOpen(false);
+            setActiveGalleryGroup(null);
+          }}
+        />
+      )}
     </div>
   );
 }
+

@@ -42,9 +42,13 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-stone-400">
               <li><Link href="/" className="transition-colors hover:text-white">Home</Link></li>
               <li><Link href="/about" className="transition-colors hover:text-white">About Us</Link></li>
+              <li><Link href="/auxiliaries" className="transition-colors hover:text-white">Church Auxiliaries</Link></li>
               <li><Link href="/sermons" className="transition-colors hover:text-white">Sermon Library</Link></li>
               <li><Link href="/blog" className="transition-colors hover:text-white">Devotionals & Announcements</Link></li>
+              <li><Link href="/gallery" className="transition-colors hover:text-white">Photo Gallery</Link></li>
               <li><Link href="/contact" className="transition-colors hover:text-white">Contact Us</Link></li>
+
+
             </ul>
           </div>
 
