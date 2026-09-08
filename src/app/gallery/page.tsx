@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 import { db } from '../../lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { GalleryGroup, GalleryImage } from '../../types';
@@ -113,8 +111,6 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-900 flex flex-col">
-      <Navbar />
-
       {/* Hero Header */}
       <header className="relative bg-stone-900 text-white pt-36 pb-20 overflow-hidden">
         <div className="absolute inset-0 opacity-25">
@@ -339,8 +335,6 @@ export default function GalleryPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <Footer />
     </div>
   );
 }

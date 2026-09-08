@@ -2,8 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 import { motion } from 'motion/react';
 import { 
   Shield, Heart, Sparkles, ArrowRight, Users, 
@@ -52,8 +50,6 @@ const auxiliariesList = [
 export default function AuxiliariesOverviewPage() {
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-900 flex flex-col">
-      <Navbar />
-
       {/* Hero Banner */}
       <header className="relative bg-stone-900 text-white pt-36 pb-24 overflow-hidden">
         <div className="absolute inset-0 opacity-25">
@@ -179,8 +175,6 @@ export default function AuxiliariesOverviewPage() {
           </Link>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

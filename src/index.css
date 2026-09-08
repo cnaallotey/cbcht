@@ -5,6 +5,7 @@
   --font-serif: var(--font-serif), ui-serif, Georgia, serif;
   
   --color-church-blue: #003399;
+  --color-church-blue-light: #0044cc;
   --color-church-gold: #EA580C;
   --color-church-gold-warm: #C2410C;
   --color-text-dark: #1A1A1A;
@@ -20,6 +21,28 @@
   --radius-4xl: 0px;
   --radius-full: 0px;
   --radius: 0px;
+
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-2xl: none;
+  --shadow: none;
+  --shadow-inner: none;
+  --drop-shadow-xs: none;
+  --drop-shadow-sm: none;
+  --drop-shadow-md: none;
+  --drop-shadow-lg: none;
+  --drop-shadow-xl: none;
+  --drop-shadow-2xl: none;
+  --drop-shadow: none;
+}
+
+*, ::before, ::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 @layer base {

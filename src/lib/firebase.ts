@@ -22,20 +22,4 @@ export const db = getFirestore(app, databaseId);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 
-async function testConnection() {
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-    console.log("Firebase connection successful");
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
-    } else {
-      console.warn("Firebase test connection failed (this is expected if 'test/connection' doc doesn't exist):", error);
-    }
-  }
-}
-
-if (typeof window !== 'undefined') {
-  testConnection();
-}
 

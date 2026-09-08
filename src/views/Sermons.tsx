@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Filter, Play, BookOpen, Download, X, Calendar, Book } from 'lucide-react';
@@ -194,11 +196,11 @@ export default function Sermons() {
                     </button>
                   </div>
 
-                  <div className="mt-12 rounded-2xl bg-white p-6 shadow-sm border border-stone-100">
+                  <div className="mt-12 rounded-none bg-white p-6 border border-stone-200">
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-church-gold-warm mb-4">Pastor Info</h5>
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full bg-stone-100 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop" alt="Pastor" />
+                      <div className="h-12 w-12 rounded-none bg-stone-100 overflow-hidden border border-stone-200">
+                        <img src="/images/head-pastor.jpg" alt="Reverend Lina Sunu Atta" className="h-full w-full object-cover object-top" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-stone-900">Reverend Lina Sunu Atta</p>

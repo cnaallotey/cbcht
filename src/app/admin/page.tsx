@@ -4,20 +4,22 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from '../../lib/firebase';
-import { collection, deleteDoc, doc, onSnapshot, addDoc } from 'firebase/firestore';
-import { Sermon, BlogPost, ServiceTime, ContactRequest, Leader, GalleryGroup } from '../../types';
-import { mockSermons, mockBlogPosts, mockServiceTimes } from '../../data/mockData';
+import { collection, deleteDoc, doc, onSnapshot, addDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { Sermon, BlogPost, ServiceTime, ContactRequest, Leader, GalleryGroup, Business } from '../../types';
+import { mockSermons, mockBlogPosts, mockServiceTimes, mockBusinesses } from '../../data/mockData';
 import { 
   Video, BookOpen, Clock, Mail, LogOut, Plus, Trash2, Edit, Database, 
-  Loader2, ExternalLink, Calendar, User, Search, RefreshCw, MessageSquare, Users, Image as ImageIcon
+  Loader2, ExternalLink, Calendar, User, Search, RefreshCw, MessageSquare, Users, Image as ImageIcon,
+  Building2, Sparkles, Check, CheckCircle2, Phone, MessageCircle, Globe, Eye, EyeOff
 } from 'lucide-react';
 import SermonForm from '../../components/admin/SermonForm';
 import BlogPostForm from '../../components/admin/BlogPostForm';
 import ServiceTimeForm from '../../components/admin/ServiceTimeForm';
 import LeaderForm from '../../components/admin/LeaderForm';
 import GalleryForm from '../../components/admin/GalleryForm';
+import BusinessForm from '../../components/admin/BusinessForm';
 
-type ActiveTab = 'sermons' | 'blogs' | 'services' | 'contacts' | 'leadership' | 'gallery';
+type ActiveTab = 'sermons' | 'blogs' | 'services' | 'contacts' | 'leadership' | 'gallery' | 'businesses';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -31,6 +33,7 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<ContactRequest[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [galleryGroups, setGalleryGroups] = useState<GalleryGroup[]>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   
   // Data Loading status
   const [dataLoading, setDataLoading] = useState(true);
@@ -47,6 +50,10 @@ export default function AdminDashboard() {
   const [leaderFormOpen, setLeaderFormOpen] = useState(false);
   const [activeGalleryGroup, setActiveGalleryGroup] = useState<GalleryGroup | null>(null);
   const [galleryFormOpen, setGalleryFormOpen] = useState(false);
+  const [activeBusiness, setActiveBusiness] = useState<Business | null>(null);
+  const [businessFormOpen, setBusinessFormOpen] = useState(false);
+  const [businessStatusFilter, setBusinessStatusFilter] = useState<'all' | 'pending' | 'published' | 'draft'>('all');
+  const [businessSearch, setBusinessSearch] = useState('');
 
   const router = useRouter();
 
@@ -116,6 +123,12 @@ export default function AdminDashboard() {
       setGalleryGroups(groupList);
     }, (err) => console.error("Gallery fetch error:", err));
 
+    const unsubBusinesses = onSnapshot(collection(db, 'businesses'), (snapshot) => {
+      const businessList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
+      businessList.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      setBusinesses(businessList);
+    }, (err) => console.error("Businesses fetch error:", err));
+
     return () => {
       unsubSermons();
       unsubBlogs();
@@ -123,6 +136,7 @@ export default function AdminDashboard() {
       unsubContacts();
       unsubLeaders();
       unsubGallery();
+      unsubBusinesses();
     };
   }, [user]);
 
@@ -132,6 +146,56 @@ export default function AdminDashboard() {
       await deleteDoc(doc(db, 'gallery', id));
     } catch (err: any) {
       alert('Failed to delete gallery group: ' + err.message);
+    }
+  };
+
+  const handleApproveBusiness = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'businesses', id), {
+        status: 'published',
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err: any) {
+      alert('Failed to approve business: ' + err.message);
+    }
+  };
+
+  const handleMoveToDraft = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'businesses', id), {
+        status: 'draft',
+        featured: false,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err: any) {
+      alert('Failed to move business to draft: ' + err.message);
+    }
+  };
+
+  const handleToggleFeatured = async (id: string, currentlyFeatured: boolean) => {
+    try {
+      const batch = writeBatch(db);
+      if (!currentlyFeatured) {
+        // Clear spotlight from any other featured businesses
+        businesses.filter(b => b.featured && b.id !== id).forEach(b => {
+          batch.update(doc(db, 'businesses', b.id), { featured: false });
+        });
+        batch.update(doc(db, 'businesses', id), { featured: true, status: 'published' });
+      } else {
+        batch.update(doc(db, 'businesses', id), { featured: false });
+      }
+      await batch.commit();
+    } catch (err: any) {
+      alert('Failed to toggle featured status: ' + err.message);
+    }
+  };
+
+  const handleDeleteBusiness = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) return;
+    try {
+      await deleteDoc(doc(db, 'businesses', id));
+    } catch (err: any) {
+      alert('Failed to delete business: ' + err.message);
     }
   };
 
@@ -147,7 +211,7 @@ export default function AdminDashboard() {
 
   // Seeder to populate default records if database is empty
   const handleSeedDatabase = async () => {
-    if (!confirm('This will seed the database with mock Sermons, Devotionals, and Service Times. Continue?')) {
+    if (!confirm('This will seed the database with mock Sermons, Devotionals, Service Times, and Business Directory listings. Continue?')) {
       return;
     }
     setSeeding(true);
@@ -169,7 +233,7 @@ export default function AdminDashboard() {
       }
       // Seed default leaders
       const mockLeaders = [
-        { name: 'Reverend Lina Sunu Atta', role: 'Head Pastor', order: 1, image: 'https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop' },
+        { name: 'Reverend Lina Sunu Atta', role: 'Head Pastor', order: 1, image: '/images/head-pastor.jpg' },
         { name: 'Rev. Emmanuel Mensah', role: 'Associate Pastor', order: 2, image: '' },
         { name: 'Deaconess Mary Appiah', role: "Women's Ministry", order: 3, image: '' }
       ];
@@ -205,6 +269,12 @@ export default function AdminDashboard() {
         await addDoc(collection(db, 'gallery'), galleryGroup);
       }
 
+      // Seed mock business directory
+      for (const business of mockBusinesses) {
+        const { id, ...data } = business;
+        await addDoc(collection(db, 'businesses'), data);
+      }
+
       alert('Mock records seeded successfully!');
     } catch (err: any) {
       console.error('Database seeding failed:', err);
@@ -225,7 +295,7 @@ export default function AdminDashboard() {
     );
   }
 
-  const isDbEmpty = sermons.length === 0 && blogs.length === 0 && services.length === 0 && leaders.length === 0 && galleryGroups.length === 0;
+  const isDbEmpty = sermons.length === 0 && blogs.length === 0 && services.length === 0 && leaders.length === 0 && galleryGroups.length === 0 && businesses.length === 0;
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 pt-28 pb-20 font-sans">
@@ -253,7 +323,7 @@ export default function AdminDashboard() {
       <main className="mx-auto max-w-7xl px-6 mt-10">
         {/* Empty Database Call to Action */}
         {isDbEmpty && !dataLoading && (
-          <div className="mb-10 rounded-none bg-church-blue/5 border border-church-blue/10 p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md shadow-church-blue/5">
+          <div className="mb-10 rounded-none bg-church-blue/5 border border-church-blue/10 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="font-serif text-2xl font-bold mb-2 flex items-center gap-2 text-stone-900">
                 <Database className="h-6 w-6 text-church-blue" />
@@ -266,7 +336,7 @@ export default function AdminDashboard() {
             <button
               onClick={handleSeedDatabase}
               disabled={seeding}
-              className="flex items-center gap-2 rounded-none bg-church-blue hover:bg-blue-800 px-8 py-4 text-xs font-bold uppercase tracking-widest text-white transition-all shadow-md disabled:opacity-50"
+              className="flex items-center gap-2 rounded-none bg-church-blue hover:bg-blue-800 px-8 py-4 text-xs font-bold uppercase tracking-widest text-white transition-all disabled:opacity-50"
             >
               {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
               Seed Database
@@ -277,19 +347,27 @@ export default function AdminDashboard() {
         {/* Tabs Bar */}
         <section className="flex flex-wrap items-center justify-between border-b border-stone-200 pb-4 mb-8 gap-4">
           <div className="flex flex-wrap gap-2 p-1 bg-stone-200/50 border border-stone-200 rounded-none">
-            {(['sermons', 'blogs', 'services', 'leadership', 'gallery', 'contacts'] as ActiveTab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2.5 rounded-none text-xs font-bold uppercase tracking-widest transition-all ${
-                  activeTab === tab 
-                    ? 'bg-church-blue text-white font-bold shadow-md' 
-                    : 'text-stone-500 hover:text-stone-900'
-                }`}
-              >
-                {tab === 'blogs' ? 'Devotionals' : tab === 'services' ? 'Services' : tab === 'contacts' ? 'Inquiries' : tab === 'leadership' ? 'Leadership' : tab === 'gallery' ? 'Gallery' : 'Sermons'}
-              </button>
-            ))}
+            {(['sermons', 'blogs', 'services', 'leadership', 'gallery', 'businesses', 'contacts'] as ActiveTab[]).map((tab) => {
+              const pendingBusinessesCount = businesses.filter(b => b.status === 'pending').length;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-2.5 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${
+                    activeTab === tab 
+                      ? 'bg-church-blue text-white font-bold' 
+                      : 'text-stone-500 hover:text-stone-900'
+                  }`}
+                >
+                  {tab === 'blogs' ? 'Devotionals' : tab === 'services' ? 'Services' : tab === 'contacts' ? 'Inquiries' : tab === 'leadership' ? 'Leadership' : tab === 'gallery' ? 'Gallery' : tab === 'businesses' ? 'Directory' : 'Sermons'}
+                  {tab === 'businesses' && pendingBusinessesCount > 0 && (
+                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-black rounded-full bg-church-gold text-white">
+                      {pendingBusinessesCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {activeTab !== 'contacts' && (
@@ -310,18 +388,21 @@ export default function AdminDashboard() {
                 } else if (activeTab === 'gallery') {
                   setActiveGalleryGroup(null);
                   setGalleryFormOpen(true);
+                } else if (activeTab === 'businesses') {
+                  setActiveBusiness(null);
+                  setBusinessFormOpen(true);
                 }
               }}
-              className="flex items-center justify-center gap-2 rounded-none bg-church-blue hover:bg-blue-800 py-3.5 px-6 text-xs font-bold uppercase tracking-widest transition-all text-white shadow-md"
+              className="flex items-center justify-center gap-2 rounded-none bg-church-blue hover:bg-blue-800 py-3.5 px-6 text-xs font-bold uppercase tracking-widest transition-all text-white"
             >
               <Plus className="h-4 w-4" />
-              Add {activeTab === 'sermons' ? 'Sermon' : activeTab === 'blogs' ? 'Devotional' : activeTab === 'services' ? 'Service' : activeTab === 'leadership' ? 'Leader' : 'Gallery Group'}
+              Add {activeTab === 'sermons' ? 'Sermon' : activeTab === 'blogs' ? 'Devotional' : activeTab === 'services' ? 'Service' : activeTab === 'leadership' ? 'Leader' : activeTab === 'gallery' ? 'Gallery Group' : 'Business'}
             </button>
           )}
         </section>
 
         {/* Dashboard Panels */}
-        <section className="bg-white border border-stone-200 rounded-none p-6 min-h-[400px] shadow-sm">
+        <section className="bg-white border border-stone-200 rounded-none p-6 min-h-[400px]">
           {dataLoading ? (
             <div className="flex flex-col items-center justify-center py-32 text-stone-500">
               <Loader2 className="h-8 w-8 animate-spin text-church-blue mb-3" />
@@ -595,7 +676,7 @@ export default function AdminDashboard() {
               {activeTab === 'contacts' && (
                 <div className="space-y-6">
                   {contacts.map((contact) => (
-                    <div key={contact.id} className="border border-stone-200 p-6 rounded-none bg-stone-50/50 shadow-sm flex flex-col gap-4">
+                    <div key={contact.id} className="border border-stone-200 p-6 rounded-none bg-stone-50/50 flex flex-col gap-4">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-stone-100 pb-3">
                         <div>
                           <span className="text-xs font-bold uppercase tracking-widest text-church-blue mb-1 block">
@@ -659,7 +740,7 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {galleryGroups.map((group) => (
-                        <div key={group.id} className="border border-stone-200 bg-white p-5 shadow-sm flex flex-col justify-between group hover:border-stone-300 transition-all">
+                        <div key={group.id} className="border border-stone-200 bg-white p-5 flex flex-col justify-between group hover:border-stone-300 transition-all">
                           <div>
                             {/* Thumbnails preview */}
                             <div className="grid grid-cols-3 gap-1 bg-stone-100 p-1 border border-stone-200 mb-4 h-32 overflow-hidden relative">
@@ -725,6 +806,237 @@ export default function AdminDashboard() {
                   )}
                 </div>
               )}
+
+              {/* Tab 7: Business Directory list */}
+              {activeTab === 'businesses' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-stone-900 flex items-center gap-2">
+                        <Building2 className="h-5 w-5 text-church-blue" />
+                        Member Business Directory
+                      </h3>
+                      <p className="text-xs text-stone-500 mt-0.5">
+                        Review member submissions, toggle spotlight badges, and manage published business listings.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
+                        <input
+                          type="text"
+                          placeholder="Search businesses..."
+                          value={businessSearch}
+                          onChange={(e) => setBusinessSearch(e.target.value)}
+                          className="pl-9 pr-3 py-1.5 text-xs bg-stone-50 border border-stone-200 focus:outline-none focus:border-church-blue w-48 sm:w-64 rounded-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-Filters */}
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {[
+                      { key: 'all', label: 'All', count: businesses.length },
+                      { key: 'pending', label: 'Pending Review', count: businesses.filter(b => b.status === 'pending').length },
+                      { key: 'published', label: 'Published', count: businesses.filter(b => b.status === 'published').length },
+                      { key: 'draft', label: 'Drafts', count: businesses.filter(b => b.status === 'draft').length },
+                    ].map((filter) => (
+                      <button
+                        key={filter.key}
+                        onClick={() => setBusinessStatusFilter(filter.key as any)}
+                        className={`px-3.5 py-1.5 rounded-none font-bold uppercase tracking-wider text-[11px] transition-colors flex items-center gap-1.5 ${
+                          businessStatusFilter === filter.key
+                            ? 'bg-stone-900 text-white'
+                            : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                        }`}
+                      >
+                        {filter.label}
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                          businessStatusFilter === filter.key
+                            ? 'bg-white/20 text-white'
+                            : filter.key === 'pending' && filter.count > 0
+                              ? 'bg-church-gold text-white'
+                              : 'bg-stone-200 text-stone-700'
+                        }`}>
+                          {filter.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Business Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm border-collapse">
+                      <thead>
+                        <tr className="border-b border-stone-200 text-xs uppercase tracking-widest text-stone-500 bg-stone-50/50">
+                          <th className="py-3 px-4">Business</th>
+                          <th className="py-3 px-4">Category</th>
+                          <th className="py-3 px-4">Contact</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4">Spotlight</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {businesses
+                          .filter(b => {
+                            const matchesStatus = businessStatusFilter === 'all' ? true : b.status === businessStatusFilter;
+                            const q = businessSearch.toLowerCase().trim();
+                            const matchesSearch = !q || (
+                              b.name?.toLowerCase().includes(q) ||
+                              b.ownerName?.toLowerCase().includes(q) ||
+                              b.category?.toLowerCase().includes(q) ||
+                              (b.location && b.location.toLowerCase().includes(q))
+                            );
+                            return matchesStatus && matchesSearch;
+                          })
+                          .map((b) => (
+                            <tr key={b.id} className="hover:bg-stone-50/50 transition-colors">
+                              <td className="py-4 px-4 font-bold text-stone-900">
+                                <div className="flex items-center gap-3">
+                                  {b.logo ? (
+                                    <img src={b.logo} alt={b.name} className="h-10 w-10 object-cover border border-stone-200 flex-shrink-0" />
+                                  ) : (
+                                    <div className="h-10 w-10 bg-church-blue/10 border border-church-blue/20 text-church-blue font-serif font-black flex items-center justify-center flex-shrink-0 text-sm">
+                                      {b.name ? b.name.charAt(0).toUpperCase() : 'B'}
+                                    </div>
+                                  )}
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="truncate max-w-[180px] font-bold text-stone-950">{b.name}</span>
+                                      {b.isChurchMember && (
+                                        <span className="hidden sm:inline-block text-[10px] uppercase font-mono px-1.5 py-0.2 bg-stone-100 text-stone-600 border border-stone-200">
+                                          Member
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs font-normal text-stone-500 truncate max-w-[200px]">
+                                      by {b.ownerName}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-stone-100 text-stone-700 border border-stone-200">
+                                  {b.category}
+                                </span>
+                              </td>
+
+                              <td className="py-4 px-4 text-xs text-stone-600">
+                                <div className="space-y-0.5">
+                                  <p className="font-mono">{b.phone}</p>
+                                  {b.whatsapp && (
+                                    <p className="text-[11px] text-emerald-700 flex items-center gap-1 font-mono">
+                                      <MessageCircle className="h-3 w-3" /> WA: {b.whatsapp}
+                                    </p>
+                                  )}
+                                  {b.location && (
+                                    <p className="text-[11px] text-stone-400 truncate max-w-[150px]">
+                                      {b.location}
+                                    </p>
+                                  )}
+                                </div>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                {b.status === 'pending' ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-50 text-orange-800 border border-orange-200 text-[10px] font-bold uppercase tracking-wider">
+                                    <Clock className="h-3 w-3 text-orange-600" /> Pending
+                                  </span>
+                                ) : b.status === 'published' ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
+                                    <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Published
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 text-stone-600 border border-stone-200 text-[10px] font-bold uppercase tracking-wider">
+                                    <EyeOff className="h-3 w-3 text-stone-400" /> Draft
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="py-4 px-4">
+                                {b.featured ? (
+                                  <button
+                                    onClick={() => handleToggleFeatured(b.id, true)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-100 text-orange-950 border border-orange-300 text-xs font-bold uppercase tracking-wider hover:bg-orange-200 transition-colors"
+                                    title="Click to remove spotlight"
+                                  >
+                                    <Sparkles className="h-3.5 w-3.5 fill-church-gold text-church-gold" /> Featured
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleToggleFeatured(b.id, false)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-50 text-stone-500 border border-stone-200 text-xs font-medium uppercase tracking-wider hover:bg-stone-100 hover:text-stone-800 transition-colors"
+                                    title="Spotlight this business (single featured business)"
+                                  >
+                                    <Sparkles className="h-3.5 w-3.5 text-stone-400" /> Spotlight
+                                  </button>
+                                )}
+                              </td>
+
+                              <td className="py-4 px-4 text-right space-x-2 whitespace-nowrap">
+                                {b.status === 'pending' || b.status === 'draft' ? (
+                                  <button
+                                    onClick={() => handleApproveBusiness(b.id)}
+                                    className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+                                  >
+                                    <Check className="h-3.5 w-3.5" /> Approve
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleMoveToDraft(b.id)}
+                                    className="text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-800 transition-colors"
+                                  >
+                                    Move to Draft
+                                  </button>
+                                )}
+
+                                {b.status === 'published' && (
+                                  <a
+                                    href={`/directory/${b.slug}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-0.5 text-xs font-bold uppercase tracking-wider text-church-blue hover:text-blue-800 transition-colors"
+                                  >
+                                    View <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                )}
+
+                                <button
+                                  onClick={() => {
+                                    setActiveBusiness(b);
+                                    setBusinessFormOpen(true);
+                                  }}
+                                  className="text-xs font-bold uppercase tracking-wider text-church-blue hover:text-blue-800 transition-colors"
+                                >
+                                  Edit
+                                </button>
+
+                                <button
+                                  onClick={() => handleDeleteBusiness(b.id, b.name)}
+                                  className="text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-800 transition-colors"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        {businesses.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="py-16 text-center text-stone-500">
+                              <Building2 className="mx-auto h-10 w-10 text-stone-300 mb-2" />
+                              <p className="italic">No business directory entries found.</p>
+                              <p className="text-xs text-stone-400 mt-1">Use &ldquo;Seed Database&rdquo; or click &ldquo;Add Business&rdquo; to populate listings.</p>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           )}
 
@@ -782,6 +1094,17 @@ export default function AdminDashboard() {
           onClose={() => {
             setGalleryFormOpen(false);
             setActiveGalleryGroup(null);
+          }}
+        />
+      )}
+
+      {/* Business Add/Edit Modal */}
+      {businessFormOpen && (
+        <BusinessForm 
+          business={activeBusiness}
+          onClose={() => {
+            setBusinessFormOpen(false);
+            setActiveBusiness(null);
           }}
         />
       )}

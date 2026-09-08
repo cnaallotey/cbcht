@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
@@ -48,9 +50,9 @@ export default function Home() {
       {/* Hero Section */}
       <section id="home" className="relative min-h-screen flex items-center pt-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2673&auto=format&fit=crop" 
-            alt="Church Hero" 
+          <img
+            src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2673&auto=format&fit=crop"
+            alt="Church Hero"
             className="h-full w-full object-cover brightness-[0.3]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-church-blue/40 to-transparent"></div>
@@ -73,8 +75,8 @@ export default function Home() {
               Join us in Lashibi as we celebrate the living Word and grow together in faith.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                href="/sermons" 
+              <Link
+                href="/sermons"
                 className="flex items-center justify-center gap-2 rounded-sm bg-church-gold px-8 py-5 text-sm font-bold uppercase tracking-widest text-church-blue transition-all hover:bg-white hover:scale-105"
               >
                 Browse Sermons
@@ -84,7 +86,7 @@ export default function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <motion.div 
+        <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50"
@@ -114,20 +116,20 @@ export default function Home() {
       <section id="about" className="py-24 bg-white overflow-hidden">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-16 lg:grid-cols-2 items-center">
-            <motion.div 
+            <motion.div
               {...fadeInUp}
               className="relative"
             >
-              <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop" 
-                  alt="Reverend Lina Sunu Atta" 
-                  className="h-full w-full object-cover"
+              <div className="relative aspect-[4/5] overflow-hidden border border-stone-200">
+                <img
+                  src="/images/head-pastor.jpg"
+                  alt="Reverend Lina Sunu Atta"
+                  className="h-full w-full object-cover object-top"
                 />
                 {/* Accent shape */}
                 <div className="absolute -bottom-6 -right-6 h-48 w-48 bg-church-gold -z-10"></div>
               </div>
-              <div className="absolute -bottom-10 -left-10 hidden md:block bg-church-blue p-8 text-white shadow-xl max-w-xs">
+              <div className="absolute -bottom-10 -left-10 hidden md:block bg-church-blue p-8 text-white max-w-xs border border-white/10">
                 <Quote className="h-8 w-8 text-church-gold mb-4" />
                 <p className="font-serif text-lg italic leading-relaxed">
                   "Our mission is to build a community that reflects the glory of God in every action."
@@ -152,27 +154,27 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 {...fadeInUp}
                 className="grid grid-cols-2 gap-8 py-8 border-y border-stone-100"
               >
                 <div>
-                  <h4 className="text-3xl font-serif font-bold text-church-blue">30+</h4>
+                  <h4 className="text-3xl font-serif font-bold text-church-blue">8+</h4>
                   <p className="text-xs font-bold uppercase tracking-widest text-stone-400">Years of Ministry</p>
                 </div>
                 <div>
-                  <h4 className="text-3xl font-serif font-bold text-church-blue">1200+</h4>
+                  <h4 className="text-3xl font-serif font-bold text-church-blue">500+</h4>
                   <p className="text-xs font-bold uppercase tracking-widest text-stone-400">Members</p>
                 </div>
               </motion.div>
 
               <motion.div {...fadeInUp}>
-              <Link 
-                href="/about" 
-                className="inline-flex items-center gap-2 rounded-full bg-church-blue px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-stone-900 hover:shadow-xl"
-              >
-                Learn More About Us <ArrowRight className="h-4 w-4" />
-              </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 rounded-none bg-church-blue px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-stone-900"
+                >
+                  Learn More About Us <ArrowRight className="h-4 w-4" />
+                </Link>
               </motion.div>
             </div>
           </div>
@@ -184,13 +186,13 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-xl">
-              <motion.span 
+              <motion.span
                 {...fadeInUp}
                 className="text-[10px] font-bold uppercase tracking-[0.4em] text-church-gold-warm mb-3 block"
               >
                 Daily Devotionals & Announcements
               </motion.span>
-              <motion.h2 
+              <motion.h2
                 {...fadeInUp}
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-4xl md:text-5xl font-serif font-bold text-stone-900"
@@ -198,8 +200,8 @@ export default function Home() {
                 Daily <span className="text-church-blue italic">Devotionals & Announcements</span>
               </motion.h2>
             </div>
-            <Link 
-              href="/blog" 
+            <Link
+              href="/blog"
               className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-church-blue border-b-2 border-church-blue pb-1 transition-all hover:gap-4"
             >
               Daily Devotionals & Announcements <ArrowRight className="h-3 w-3" />
@@ -231,8 +233,8 @@ export default function Home() {
               We can't wait to meet you. Join our vibrant community and experience the warmth and power of Halleluyah Temple.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="w-full sm:w-auto rounded-full bg-church-gold px-12 py-5 text-sm font-bold uppercase tracking-widest text-church-blue transition-all hover:bg-white"
               >
                 Plan Your Visit
@@ -249,7 +251,7 @@ export default function Home() {
       {selectedPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white border border-stone-200 w-full max-w-2xl rounded-none p-6 md:p-8 text-stone-900 shadow-2xl relative my-8 animate-in fade-in zoom-in-95 duration-200">
-            <button 
+            <button
               onClick={() => setSelectedPost(null)}
               className="absolute right-6 top-6 p-2 rounded-none bg-stone-50 border border-stone-200 hover:bg-stone-100 transition-colors text-stone-500 hover:text-stone-900"
             >
@@ -273,7 +275,7 @@ export default function Home() {
               {selectedPost.content}
             </div>
             <div className="mt-8 pt-4 border-t border-stone-100 flex justify-end">
-              <button 
+              <button
                 onClick={() => setSelectedPost(null)}
                 className="px-6 py-2.5 bg-church-blue hover:bg-blue-800 text-white font-bold uppercase tracking-widest text-xs shadow-md"
               >

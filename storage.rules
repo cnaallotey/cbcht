@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Default deny all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email == 'admin@cbcht.com' &&
+             request.auth.token.email_verified == true;
+    }
+
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024 &&
+             request.resource.contentType.matches('image/(png|jpeg|webp)');
+    }
+
+    // Business directory image assets
+    match /businesses/{imageId} {
+      // Anyone can read business logos and gallery images
+      allow read: if true;
+      // Allow upload of images under 5MB of type PNG, JPEG, WebP
+      allow create: if isValidImage();
+      // Only verified admin can update or delete
+      allow update, delete: if isAdmin();
+    }
+  }
+}

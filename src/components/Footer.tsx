@@ -24,14 +24,14 @@ export default function Footer() {
               A place of worship, community, and the living Word. Join us as we grow together in faith and serve the Lashibi community and beyond.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="rounded-full bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-church-blue hover:text-white">
+              <a href="#" aria-label="Facebook" className="rounded-none bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-church-blue hover:text-white">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="rounded-full bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-red-600 hover:text-white">
+              <a href="#" aria-label="YouTube" className="rounded-none bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-red-600 hover:text-white">
                 <Youtube className="h-5 w-5" />
               </a>
-              <a href="#" className="rounded-full bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-green-600 hover:text-white">
-                <MessageCircle className="h-5 w-5" />
+              <a href="#" aria-label="WhatsApp" className="rounded-none bg-stone-800 p-2 text-stone-400 transition-colors hover:bg-green-600 hover:text-white flex items-center justify-center">
+                <img src="/images/whatsapp-white.svg" alt="" aria-hidden="true" className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -43,6 +43,7 @@ export default function Footer() {
               <li><Link href="/" className="transition-colors hover:text-white">Home</Link></li>
               <li><Link href="/about" className="transition-colors hover:text-white">About Us</Link></li>
               <li><Link href="/auxiliaries" className="transition-colors hover:text-white">Church Auxiliaries</Link></li>
+              <li><Link href="/directory" className="transition-colors hover:text-white">Business Directory</Link></li>
               <li><Link href="/sermons" className="transition-colors hover:text-white">Sermon Library</Link></li>
               <li><Link href="/blog" className="transition-colors hover:text-white">Devotionals & Announcements</Link></li>
               <li><Link href="/gallery" className="transition-colors hover:text-white">Photo Gallery</Link></li>
@@ -83,12 +84,12 @@ export default function Footer() {
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Midweek Bible Study</p>
                 <p className="text-lg font-bold">Wednesday, 6:30 PM</p>
               </div>
-               <div>
+              <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold">Prayer Meetings</p>
                 <p className="text-lg font-bold">Friday, 6:30 PM</p>
               </div>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-church-blue py-3 text-sm font-bold transition-all hover:bg-blue-800"
               >
                 Plan Your Visit <ExternalLink className="h-3 w-3" />
@@ -99,7 +100,7 @@ export default function Footer() {
 
         <div className="mt-20 border-t border-stone-800 pt-10 text-center text-xs text-stone-500">
           <p>© {new Date().getFullYear()} Calvary Baptist Church — Halleluyah Temple. All Rights Reserved.</p>
-          <p className="mt-2 uppercase tracking-widest">A place of worship, community & the living Word</p>
+          <p className="mt-2 uppercase tracking-widest">Being and Making Disciples</p>
         </div>
       </div>
     </footer>

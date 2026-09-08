@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Navbar from '../../../components/Navbar';
-import Footer from '../../../components/Footer';
 import { motion } from 'motion/react';
 import { 
   Sparkles, CheckCircle2, Calendar, Clock, MapPin, 
@@ -46,8 +44,6 @@ export default function YoungGenerationPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-900 flex flex-col">
-      <Navbar />
-
       {/* Hero Header */}
       <header className="relative bg-stone-900 text-white pt-36 pb-24 overflow-hidden">
         <div className="absolute inset-0 opacity-35">
@@ -263,8 +259,6 @@ export default function YoungGenerationPage() {
           )}
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

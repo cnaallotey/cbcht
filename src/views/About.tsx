@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { History, ShieldCheck, Heart, User, Users, MapPin, Loader2 } from 'lucide-react';
@@ -16,7 +18,7 @@ export default function About() {
   const [loading, setLoading] = useState(true);
 
   const defaultLeaders: Leader[] = [
-    { id: '1', name: 'Reverend Lina Sunu Atta', role: 'Head Pastor', order: 1, image: 'https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop' },
+    { id: '1', name: 'Reverend Lina Sunu Atta', role: 'Head Pastor', order: 1, image: '/images/head-pastor.jpg' },
     { id: '2', name: 'Rev. Emmanuel Mensah', role: 'Associate Pastor', order: 2 },
     { id: '3', name: 'Deaconess Mary Appiah', role: "Women's Ministry", order: 3 }
   ];
@@ -84,7 +86,7 @@ export default function About() {
             </div>
           </motion.div>
           <motion.div {...fadeInUp} transition={{ delay: 0.2 }}>
-            <div className="relative aspect-[4/3] rounded-none overflow-hidden shadow-2xl">
+            <div className="relative aspect-[4/3] rounded-none overflow-hidden border border-stone-200">
               <img 
                 src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?q=80&w=2603&auto=format&fit=crop" 
                 alt="Church History"
@@ -164,7 +166,7 @@ export default function About() {
                 transition={{ delay: idx * 0.1 }}
                 className="text-center group"
               >
-                <div className="relative mb-6 aspect-square overflow-hidden rounded-none bg-stone-100 shadow-md border border-stone-200">
+                <div className="relative mb-6 aspect-square overflow-hidden rounded-none bg-stone-100 border border-stone-200">
                   {leader.image ? (
                     <img 
                       src={leader.image} 
