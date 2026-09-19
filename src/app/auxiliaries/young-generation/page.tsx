@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Sparkles, CheckCircle2, Calendar, Clock, MapPin, 
-  Send, Users, Music, Briefcase, GraduationCap, Flame, Loader2 
+import {
+  Sparkles, CheckCircle2, Calendar, Clock, MapPin,
+  Send, Users, Music, Briefcase, GraduationCap, Flame, Loader2
 } from 'lucide-react';
 import { db } from '../../../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -47,9 +47,9 @@ export default function YoungGenerationPage() {
       {/* Hero Header */}
       <header className="relative bg-stone-900 text-white pt-36 pb-24 overflow-hidden">
         <div className="absolute inset-0 opacity-35">
-          <img 
-            src="https://images.unsplash.com/photo-1469474094887-b1e7632f7b21?q=80&w=2547&auto=format&fit=crop" 
-            alt="Young Generation Youth Worship" 
+          <img
+            src="https://images.unsplash.com/photo-1469474094887-b1e7632f7b21?q=80&w=2547&auto=format&fit=crop"
+            alt="Young Generation Youth Worship"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/80 to-transparent" />
@@ -88,7 +88,7 @@ export default function YoungGenerationPage() {
                 <div className="p-3 bg-amber-100 text-amber-800 w-fit mb-4 font-bold text-xs uppercase tracking-wider">
                   Ages 3 &ndash; 12
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Children&apos;s Church</h3>
+                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Toddlers and Middle Class</h3>
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold mb-3">Kingdom Kids</p>
                 <p className="text-sm text-stone-600 leading-relaxed mb-4">
                   Interactive Sunday School lessons, Bible memory verses, songs, puppet shows, and creative arts that lay a solid spiritual foundation.
@@ -106,7 +106,7 @@ export default function YoungGenerationPage() {
                 <div className="p-3 bg-blue-100 text-blue-800 w-fit mb-4 font-bold text-xs uppercase tracking-wider">
                   Ages 13 &ndash; 19
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Teens Ministry</h3>
+                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Teens Chapel</h3>
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold mb-3">Generation Impact</p>
                 <p className="text-sm text-stone-600 leading-relaxed mb-4">
                   A safe, high-energy environment addressing identity, peer pressure, academics, and spiritual growth through vibrant discussions and camps.
@@ -124,7 +124,7 @@ export default function YoungGenerationPage() {
                 <div className="p-3 bg-purple-100 text-purple-800 w-fit mb-4 font-bold text-xs uppercase tracking-wider">
                   Ages 20 &ndash; 35
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Young Adults &amp; Campus</h3>
+                <h3 className="font-serif text-2xl font-bold text-stone-900 mb-2">Youth Ministry</h3>
                 <p className="text-xs font-bold uppercase tracking-widest text-church-gold mb-3">Halleluyah Trailblazers</p>
                 <p className="text-sm text-stone-600 leading-relaxed mb-4">
                   Empowering university students and young professionals with career mentorship, relationship seminars, worship nights, and missions.
@@ -190,7 +190,7 @@ export default function YoungGenerationPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">Full Name *</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     className="w-full border border-stone-200 bg-stone-50 p-3 text-sm focus:bg-white focus:outline-none focus:border-church-blue"
@@ -200,7 +200,7 @@ export default function YoungGenerationPage() {
                 </div>
                 <div className="space-y-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">Phone Number *</label>
-                  <input 
+                  <input
                     type="tel"
                     required
                     className="w-full border border-stone-200 bg-stone-50 p-3 text-sm focus:bg-white focus:outline-none focus:border-church-blue"
@@ -213,7 +213,7 @@ export default function YoungGenerationPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">Email Address *</label>
-                  <input 
+                  <input
                     type="email"
                     required
                     className="w-full border border-stone-200 bg-stone-50 p-3 text-sm focus:bg-white focus:outline-none focus:border-church-blue"
@@ -238,7 +238,7 @@ export default function YoungGenerationPage() {
 
               <div className="space-y-1">
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">Message / Inquiry</label>
-                <textarea 
+                <textarea
                   rows={3}
                   placeholder="I'd like to get involved in youth worship team / register for youth fellowship..."
                   className="w-full border border-stone-200 bg-stone-50 p-3 text-sm focus:bg-white focus:outline-none focus:border-church-blue"

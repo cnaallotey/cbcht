@@ -119,7 +119,9 @@ export default function Contact() {
               </div>
               <div className="mt-8 flex gap-4 border-t border-white/10 pt-8">
                 <Facebook className="h-5 w-5 cursor-pointer transition-colors hover:text-church-gold" />
-                <Youtube className="h-5 w-5 cursor-pointer transition-colors hover:text-church-gold" />
+                <a href="https://www.youtube.com/channel/UCeCG2b6qm2VA3fO0Rvy31BA" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                  <Youtube className="h-5 w-5 transition-colors hover:text-church-gold" />
+                </a>
                 <MessageCircle className="h-5 w-5 cursor-pointer transition-colors hover:text-church-gold" />
               </div>
             </motion.div>
